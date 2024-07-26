@@ -6,6 +6,8 @@ A JQuery plugin for quickly build, validate and submit an html form.
 
 ------
 
+https://cdn.jsdelivr.net/gh/skpaul/formstar@1.0.0/formstar.min.js
+
 Prerequisite: JQuery, moment.js and sweetModal.js
 
 ```javascript
@@ -147,5 +149,56 @@ Available data types-
 ```html
 <input type="file" class="validate photo" data-maxkb="100" data-height="300" data-width="300">
 <input type="file" class="validate signature" data-maxkb="100" data-height="300" data-width="80">
+```
+
+
+
+## Functions Template
+
+```javascript
+var $icon = $('.buttonIcon');
+var $submitButton = $('.form-submit-button');
+
+function beforeSend(){
+	$icon.addClass('spinner').html("autorenew").css("color", "#A3B9D8");
+	$submitButton.attr('disabled', 'disabled');
+}
+
+function success(response){
+	if(response.issuccess){
+	     $icon.removeClass('spinner').html("done").css("color", "#A3B9D8");
+	     window.location = response.redirecturl;
+    }
+    else{
+		$.sweetModal({
+			content: response.message,
+			icon: $.sweetModal.ICON_WARNING
+		});
+		$submitButton.removeAttr('disabled');
+		$icon.removeClass('spinner').html("arrow_forward").css("color", "#A3B9D8");
+	}
+}
+
+function error(a,b,c){
+	$.sweetModal({
+		content: 'Failed to communicate with server',
+		icon: $.sweetModal.ICON_WARNING
+	});
+	console.log(b + ", " + c);
+	$submitButton.removeAttr('disabled');
+	$icon.removeClass('spinner').html("arrow_forward").css("color", "#A3B9D8");
+}
+
+function validationRule() {
+	let checked = false;
+	if (!checked) {
+		$.sweetModal({
+			content: 'Please provide your consent in the declaration section.',
+			icon: $.sweetModal.ICON_WARNING
+		});
+		return false;
+	}
+	return true;
+}
 ```
 
