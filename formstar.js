@@ -1,4 +1,4 @@
-﻿//swift-form 	: Previously 'swift-submit', 'swift-form' is a handy tool to quickly submit the html form. 
+﻿//formstar 	    : It is a handy tool to quickly submit the html form. 
 //author		: Saumitra Kumar Paul. skpaul@gmail.com.
 //Copyright		: You are free to use it anywhere anytime. But a thank-giving mail is appretiatable.
 //Last update   : 24th July, 2024
