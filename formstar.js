@@ -8,6 +8,7 @@
 // git tag 		//show current tags
 // git tag v11.0.22   	//create new tag
 // git push --tags -u origin master
+// https://codebeautify.org/minify-js
 
 (function ($) {
     $.fn.formstar = function (options) {
