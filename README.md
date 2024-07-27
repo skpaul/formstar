@@ -6,64 +6,87 @@ A JQuery plugin for quickly build, validate and submit an html form.
 
 ------
 
-https://cdn.jsdelivr.net/gh/skpaul/formstar@1.0.0/formstar.min.js
+**Using from a CDN**
 
-Prerequisite: JQuery, moment.js and sweetModal.js
+```html
+<script src="https://cdn.jsdelivr.net/gh/skpaul/formstar@1.0.0/formstar.min.js"></script>
+```
 
-```javascript
-$('#form-one').formstar({ajax:false});  //submitted without JQuery AJAX.
+**Manual installation**
 
-$('#form-two').formstar();  //submitted using JQuery AJAX.
+It is strongly recommend that you use a CDN. This will make it easier for you to deploy your project in different environments, and easily update FormStar when new versions are released. Nonetheless if you prefer to integrate FormStar into your project manually, you can download the release of your choice from GitHub and copy the files into your project.
+
+Include the compiled files in your page:
+
+```html
+<script src="path/to/formstar.min.js"></script>
 ```
 
 
 
-## Configuration Options
-
-------
-
-ajax : true/false. Default is true.
-
-validationRules: function,
-
-beforeSend: function
-
-additionalBeforeSend: function
-
-success: function,
-
-error: function,
-
-complete: function,
-
-reset: true/false. Default is true.
+Prerequisite: JQuery, moment.js and sweetModal.js
 
 
 
-## Submit Button
+## Basic usage
 
-------
+```javascript
+$('#form-one').formstar(); 
+$('#form-two').formstar();
+```
+
+
+
+## Configuration
+
+To configure custom options when you initialize FormStar, simply pass an object in your call to `.formstar()`
+
+```javascript
+$('#form-one').formstar({ajax:false});  //submitted without JQuery AJAX.
+```
+
+
+
+## Options
+
+This is a list of all the `FormStar` configuration options-
+
+| Option            | Type                | Default | Description |
+| ----------------- | ------------------- | ------- | ----------- |
+| `ajax`            | boolean             | `true`  |             |
+| `validationRules` | callback function() | null    |             |
+| `beforeSend`      | callback function() | `null`  |             |
+| `success`         | callback function() | `null`  |             |
+| `error`           | callback function() | `null`  |             |
+| `complete`        | callback function() | `null`  |             |
+| `reset`           | boolean             | `true`  |             |
+
+
+
+## Form Submit Button
+
+You must use `<button type="submit">...</button>` element to submit the form.
 
 ```html
-//A simple button
-<button type="submit">Submit</button>
+<form>
+    <!--A simple button-->
+    <button type="submit">Submit</button>
 
-//Or, more styling approach
-<button type="submit">
-	<span class="buttonText">Submit</span>
-    <span class="buttonIcon">icon-name</span>
-</button>
+    <!--or, more styling approach-->
+    <button type="submit">
+        <span class="buttonText">Submit</span>
+        <span class="buttonIcon">icon-name</span>
+    </button>
+</form> 
 
 //NOTE: no element can have the reserved word "submit" as ID or NAME in the form.
 ```
 
 
 
-## Form Validation
+## Form Validation Basics
 
-------
-
-The validating input element must have `class="validate"`
+The validating input element must have `.validate` class.
 
 ```html
 <div class="field">
@@ -71,19 +94,45 @@ The validating input element must have `class="validate"`
 	<input type="text" class="validate">
 </div>
 
-//if the input does not have any label, then input must have "data-title" attribute.
+<!--if the input does not have any label, then input must have "data-title" attribute.-->
 <input type="text" class="validate" data-title="Student Name">
 
 //if .field element has .hidden, it will not be validated
+
 <div class="field hidden">
     <label>Name</label>
 	<input type="text" class="validate">
 </div>
 ```
 
+If the input does not have any label, then input must have `data-title` attribute -
+
+```html
+
+<input type="text" class="validate" data-title="Student Name">
+
+//if .field element has .hidden, it will not be validated
+
+<div class="field hidden">
+    <label>Name</label>
+	<input type="text" class="validate">
+</div>
+```
+
+If `.field` element has `.hidden`, it will not be validated -
+
+```html
+<div class="field hidden">
+    <label>Name</label>
+	<input type="text" class="validate">
+</div>
+```
+
+
+
 ### Required/Optional
 
-if data-required attribute is absent, the element becomes optional.
+if `data-required` attribute is absent, the element becomes optional -
 
 ```html
 <input type="text" class="validate" data-required="required">
