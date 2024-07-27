@@ -93,30 +93,12 @@ The validating input element must have `.validate` class.
     <label>Name</label>
 	<input type="text" class="validate">
 </div>
-
-<!--if the input does not have any label, then input must have "data-title" attribute.-->
-<input type="text" class="validate" data-title="Student Name">
-
-//if .field element has .hidden, it will not be validated
-
-<div class="field hidden">
-    <label>Name</label>
-	<input type="text" class="validate">
-</div>
 ```
 
 If the input does not have any label, then input must have `data-title` attribute -
 
 ```html
-
 <input type="text" class="validate" data-title="Student Name">
-
-//if .field element has .hidden, it will not be validated
-
-<div class="field hidden">
-    <label>Name</label>
-	<input type="text" class="validate">
-</div>
 ```
 
 If `.field` element has `.hidden`, it will not be validated -
