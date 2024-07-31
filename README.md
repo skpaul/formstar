@@ -4,6 +4,8 @@ A JQuery plugin for quickly build, validate and submit an html form.
 
 ## Installation
 
+------
+
 **Using from a CDN**
 
 ```html
