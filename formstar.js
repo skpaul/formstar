@@ -23,6 +23,7 @@
             afterValidation: null,
             beforeSend: null,
             success: null,
+            successUndefined:null,
             beforeRedirect: null,
             error: null,
             complete: null,
@@ -550,29 +551,12 @@
             }
             else {
                 if(typeof response.issuccess == typeof undefined){
-                    button.removeAttr('disabled');
-                    console.log(response);
-                    if(buttonTextElement.length !== 0){
-                        buttonTextElement.html(buttonText);
-                        buttonIconElement.removeClass('spinner').html("arrow_forward").css("color", "#A3B9D8");
+                    if(settings.successUndefined){
+                        settings.successUndefined();
                     }
                     else{
-                        button.html(buttonText);
-                    }
-                    alert("Problem in getting response from server. Please try again.");
-                    return false;
-                }
-            
-                if(response.issuccess){
-                    //If server sends any message to display, then show it here.
-                    if(typeof response.message != typeof undefined )  //same as-> if(typeof $response.message != 'undefined' )
-                    {
-                        $.sweetModal({
-                            content: response.message,
-                            icon: $.sweetModal.ICON_SUCCESS
-                        });
-
                         button.removeAttr('disabled');
+                        console.log(response);
                         if(buttonTextElement.length !== 0){
                             buttonTextElement.html(buttonText);
                             buttonIconElement.removeClass('spinner').html("arrow_forward").css("color", "#A3B9D8");
@@ -580,20 +564,49 @@
                         else{
                             button.html(buttonText);
                         }
-                        
-                        if(settings.reset){
-                            resetForm(form);
+                        alert("Problem in getting response from server. Please try again.");
+                    }
+                   
+                    return false;
+                }
+            
+                if(response.issuccess){
+                    if(settings.successOk){
+                        settings.successOk();
+                    }
+                    else{
+                        //If server sends any message to display, then show it here.
+                        if(typeof response.message != typeof undefined )  //same as-> if(typeof $response.message != 'undefined' )
+                        {
+                            $.sweetModal({
+                                content: response.message,
+                                icon: $.sweetModal.ICON_SUCCESS
+                            });
+
+                            button.removeAttr('disabled');
+                            if(buttonTextElement.length !== 0){
+                                buttonTextElement.html(buttonText);
+                                buttonIconElement.removeClass('spinner').html("arrow_forward").css("color", "#A3B9D8");
+                            }
+                            else{
+                                button.html(buttonText);
+                            }
+                            
+                            if(settings.reset){
+                                resetForm(form);
+                            }
+                        }
+
+                        //If server sends any redirecturl, redirect to that url.
+                        if(typeof response.redirecturl != typeof undefined )  //same as -> if(typeof $response.redirecturl != 'undefined' )
+                        {
+                            if(settings.beforeRedirect){
+                                settings.beforeRedirect();
+                            }
+                            window.location = response.redirecturl;
                         }
                     }
 
-                    //If server sends any redirecturl, redirect to that url.
-                    if(typeof response.redirecturl != typeof undefined )  //same as -> if(typeof $response.redirecturl != 'undefined' )
-                    {
-                        if(settings.beforeRedirect){
-                            settings.beforeRedirect();
-                        }
-                        window.location = response.redirecturl;
-                    }
                 } //<--- response.issuccess
                 else{
                     $.sweetModal({
