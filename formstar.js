@@ -22,12 +22,22 @@
             validationRules: null,
             afterValidation: null,
             beforeSend: null,
-            success: null,
+            response: null,
             successUndefined:null,
+            success:null,
+            successMessage:null,
+            successButton:null,
+            fail:null,
+            failMessage:null,
+            failButton:null,
             beforeRedirect: null,
+            onRedirect: null,
             error: null,
             complete: null,
-            reset: true
+            reset: true,
+            beforeReset:null,
+            onReset:null,
+            afterReset:null
         }, options);
 
         var action = form.attr('action');
@@ -518,7 +528,7 @@
 
         function onBeforeSend() {
             if (settings.beforeSend) {
-                settings.beforeSend();
+                settings.beforeSend(form);
             }
             else{
                 if(buttonTextElement.length !== 0) {
@@ -537,26 +547,18 @@
         }
 
         function onSuccess(response){
-            if (settings.success){
-                // button.removeAttr('disabled');
-                // if(buttonTextElement.length !== 0){
-                //     buttonTextElement.html(buttonText);
-                //     buttonIconElement.removeClass('spinner').html("done").css("color", "#A3B9D8");
-                // }
-                // else{
-                //     button.html(buttonText);
-                // }
-                
-                settings.success(response);
+            //Handle all the functions after a response arrives from server, OR leave it for formstar.
+            if (settings.response){
+                settings.response(response, form);
             }
             else {
                 if(typeof response.issuccess == typeof undefined){
                     if(settings.successUndefined){
-                        settings.successUndefined();
+                        settings.successUndefined(response, form);
                     }
                     else{
                         button.removeAttr('disabled');
-                        console.log(response);
+                        console.log("response.issuccess property undefined. Details- " + response);
                         if(buttonTextElement.length !== 0){
                             buttonTextElement.html(buttonText);
                             buttonIconElement.removeClass('spinner').html("arrow_forward").css("color", "#A3B9D8");
@@ -568,60 +570,116 @@
                     }
                    
                     return false;
-                }
+                } //<-- response.issuccess == typeof undefined
             
                 if(response.issuccess){
-                    if(settings.successOk){
-                        settings.successOk();
+                    //Handle all the success consequences (show success msg, change button state & reset form), OR leave it for formstar.
+                    if(settings.success){
+                        settings.success(response, form);
                     }
                     else{
                         //If server sends any message to display, then show it here.
                         if(typeof response.message != typeof undefined )  //same as-> if(typeof $response.message != 'undefined' )
                         {
-                            $.sweetModal({
-                                content: response.message,
-                                icon: $.sweetModal.ICON_SUCCESS
-                            });
-
-                            button.removeAttr('disabled');
-                            if(buttonTextElement.length !== 0){
-                                buttonTextElement.html(buttonText);
-                                buttonIconElement.removeClass('spinner').html("arrow_forward").css("color", "#A3B9D8");
+                            //Show the success message by yourself, or leave it for formstar.
+                            if(settings.successMessage){
+                                settings.successMessage(response.message);
                             }
                             else{
-                                button.html(buttonText);
+                                $.sweetModal({
+                                    content: response.message,
+                                    icon: $.sweetModal.ICON_SUCCESS
+                                });
                             }
-                            
+                           
+                            //Change the button state by yourself, or leave it for formstar.
+                            if(settings.successButton){
+                                settings.successButton(button);
+                            }
+                            else{
+                                button.removeAttr('disabled');
+                                if(buttonTextElement.length !== 0){
+                                    buttonTextElement.html(buttonText);
+                                    buttonIconElement.removeClass('spinner').html("arrow_forward").css("color", "#A3B9D8");
+                                }
+                                else{
+                                    button.html(buttonText);
+                                }
+                            }
+                          
+                            //beforeReset(), onReset(), afterReset()
                             if(settings.reset){
-                                resetForm(form);
+                                //Do some tasks before the actual reset starts-
+                                if(settings.beforeReset){
+                                    settings.beforeReset(form);
+                                }
+                                
+                                //Reset the form in your own way, or leave it for formstar.
+                                if(settings.onReset){
+                                    settings.onReset(form);
+                                }
+                                else{
+                                    resetForm(form);
+                                }
+
+                                //Do some tasks after the actual reset completes-
+                                if(settings.afterReset){
+                                    settings.afterReset(form);
+                                }
                             }
                         }
 
                         //If server sends any redirecturl, redirect to that url.
                         if(typeof response.redirecturl != typeof undefined )  //same as -> if(typeof $response.redirecturl != 'undefined' )
                         {
+                            //Useful if you want to change DOM elements.
                             if(settings.beforeRedirect){
                                 settings.beforeRedirect();
                             }
-                            window.location = response.redirecturl;
+
+                            //Useful if you want to modify the response.redirecturl i.e. add/edit query string parameter/s.
+                            if(settings.onRedirect){
+                                settings.onRedirect();
+                            }
+                            else{
+                                window.location = response.redirecturl;
+                            }
                         }
                     }
 
                 } //<--- response.issuccess
                 else{
-                    $.sweetModal({
-                        content: response.message,
-                        icon: $.sweetModal.ICON_WARNING
-                    });
-
-                    button.removeAttr('disabled');
-                    if(buttonTextElement.length !== 0 ){
-                        buttonTextElement.html('Try again');
-                        buttonIconElement.removeClass('spinner').html("arrow_forward").css("color", "#A3B9D8");
+                    //Handle all the fail consequences (show fail msg & change button state), OR leave it for formstar.
+                    if(settings.fail){
+                        settings.fail(response, form);
                     }
                     else{
-                        button.html('Try again');
-                    }                   
+                        //Show the message by yourself, OR, leave it for formstar.
+                        if(settings.failMessage){
+                            settings.failMessage(response.message);
+                        }
+                        else{
+                            $.sweetModal({
+                                content: response.message,
+                                icon: $.sweetModal.ICON_WARNING
+                            });
+                        }
+
+                        //Change the button state by yourself, OR, leave it for formstar.
+                        if(settings.failButton){
+                            settings.failButton(button);
+                        }
+                        else{
+                            button.removeAttr('disabled');
+                            if(buttonTextElement.length !== 0 ){
+                                buttonTextElement.html('Try again');
+                                buttonIconElement.removeClass('spinner').html("arrow_forward").css("color", "#A3B9D8");
+                            }
+                            else{
+                                button.html('Try again');
+                            }  
+                        }
+                    }
                 }
             }
         } //success ends
