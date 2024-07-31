@@ -51,15 +51,143 @@ $('#form-one').formstar({ajax:false});  //submitted without JQuery AJAX.
 
 This is a list of all the `FormStar` configuration options-
 
-| Option            | Type                | Default | Description |
-| ----------------- | ------------------- | ------- | ----------- |
-| `ajax`            | boolean             | `true`  |             |
-| `validationRules` | callback function() | null    |             |
-| `beforeSend`      | callback function() | `null`  |             |
-| `success`         | callback function() | `null`  |             |
-| `error`           | callback function() | `null`  |             |
-| `complete`        | callback function() | `null`  |             |
-| `reset`           | boolean             | `true`  |             |
+| Option             | Type                | Default | Description                                                  |
+| ------------------ | ------------------- | ------- | ------------------------------------------------------------ |
+| `ajax`             | boolean             | `true`  |                                                              |
+| `extraData`        | object              | `null`  | Any additional data outside of the form. See examples below for details. |
+| `beforeValidation` | callback function() | `null`  | If provided, it will be executed before the built-in validation starts. <br />See example below for details. |
+| `validationRules`  | callback function() | `null`  | If provided, it will **completely replace** the built-in validation mechanism. <br />See example below for details. |
+| `afterValidation`  | callback function() | `null`  | If provided, it will be executed after the built-in validation finishes. <br />See example below for details. |
+| `beforeSend`       | callback function() | `null`  |                                                              |
+| `success`          | callback function() | `null`  |                                                              |
+| `error`            | callback function() | `null`  |                                                              |
+| `complete`         | callback function() | `null`  |                                                              |
+| `reset`            | boolean             | `true`  |                                                              |
+
+### Options example
+
+```javascript
+//Default value is true. This option is not needed if submitting via ajax.
+$('form').formstar({ajax:false});
+```
+
+**extraData**
+
+```javascript
+//These will be append to the main form before submit. extraData is only available for ajax submit.
+$('form').formstar({
+                      ajax:true,
+                      extraData:{name:"abc", age:25}
+                 });
+```
+
+**beforeValidation**
+
+If provided, it will be executed before the built-in validation starts. This option useful if you want to do some pre-checks before the built-in validation starts.
+
+```javascript
+function beforeValidation() {
+     let something = false;
+     if (!something) {
+         $.sweetModal({
+             content: 'Display some message to the user',
+             icon: $.sweetModal.ICON_WARNING
+         });
+         return false;  //must return false if validation fails.
+     }
+     return true; //must return true if validation passes.
+}
+
+//usage
+$('form').formstar({
+    				success:onSuccess,
+    				extraData:{name:"abc", id:104525},
+    				beforeValidation: beforeValidation
+				});
+```
+
+**validationRules**
+
+If provided, it will **completely replace** the built-in validation mechanism.
+
+```javascript
+//example function
+function validationRules() {
+     let something = false;
+     if (!something) {
+         $.sweetModal({
+             content: 'Display some message to the user',
+             icon: $.sweetModal.ICON_WARNING
+         });
+         return false;  //must return false if validation fails.
+     }
+     return true; //must return true if validation passes.
+}
+
+//usage
+$('form').formstar({
+					extraData:{name:"abc", id:104525},
+					beforeValidation: beforeValidation,
+					validationRules: validationRules,
+					success:onSuccess
+				});
+```
+
+**afterValidation**
+
+If provided, it will be executed after the built-in validation completed. This option useful if you want to do some post-checks after the built-in validation completes.
+
+```javascript
+function afterValidation() {
+     let something = false;
+     if (!something) {
+         $.sweetModal({
+             content: 'Display some message to the user',
+             icon: $.sweetModal.ICON_WARNING
+         });
+         return false;  //must return false if validation fails.
+     }
+     return true; //must return true if validation passes.
+}
+
+//usage
+$('form').formstar({
+					extraData:{name:"abc", id:104525},
+					beforeValidation: beforeValidation,
+					validationRules: validationRules,
+					afterValidation: afterValidation,			
+					success:onSuccess
+				});
+```
+
+### **success**
+
+It will **completely replace** the built-in `success()` function.
+
+```javascript
+//example function
+function onSuccess(response){
+    //By default, 'response' is a JavaScript object. But you can send any other format also from your back-end.
+    if(response.issuccess){
+        $icon.removeClass('spinner').html("done").css("color", "#A3B9D8"); //do some DOM manipulation.
+        window.location = response.redirecturl; //or, redirect elsewhere.
+    }
+    else{
+        $.sweetModal({
+           content: response.message,  //or, show server-sent message to the user.
+              icon: $.sweetModal.ICON_WARNING
+          });
+          $submitButton.removeAttr('disabled');
+          $icon.removeClass('spinner').html("arrow_forward").css("color", "#A3B9D8");
+    }
+}
+
+//usage
+$('form').formstar({
+    				success:onSuccess,
+    				extraData:{name:"abc", id:104525}
+				});
+```
 
 
 

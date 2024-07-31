@@ -16,13 +16,15 @@
 
         var settings = $.extend({
             format: "auto",
+            extraData: null,
             ajax:true,
-            validationRules: "",
-            beforeSend:"",
-            additionalBeforeSend: "",
-            success: "",
-            error: "",
-            complete: "",
+            beforeValidation: null,
+            validationRules: null,
+            afterValidation: null,
+            beforeSend: null,
+            success: null,
+            error: null,
+            complete: null,
             reset: true
         }, options);
 
@@ -56,424 +58,436 @@
             event.preventDefault();
             event.stopPropagation();
             var hasError = false;
-                        
-            // $('.validate').each(function(i, obj) {
-            form.find('.validate').each(function(i, obj) {
-                var element = $(this);
 
-                var title = element.attr("data-title");
-                if ( typeof title == typeof undefined) {
-                    title = element.parent('.field').find("label").html();
-                }
-
-                
-                var dataType = element.attr("data-datatype");
-                var value = element.val(); //$.trim();
-
-                if(element.parent('.field').hasClass("hidden")){
+            if(settings.beforeValidation) {
+                if (settings.beforeValidation() == false) {
                     return;
                 }
+            }
 
-                var closestToggleVisibleWrapper = element.closest(".toggleVisibleWrapper");
-                if(typeof closestToggleVisibleWrapper != typeof undefined ){
-                    if(closestToggleVisibleWrapper.hasClass("hidden")){
-                        // alert("has");
+            if(settings.validationRules) {
+                if (settings.validationRules() == false) {
+                    return;
+                }
+            }
+            else{
+                form.find('.validate').each(function(i, obj) {
+                    var element = $(this);
+
+                    var title = element.attr("data-title");
+                    if ( typeof title == typeof undefined) {
+                        title = element.parent('.field').find("label").html();
+                    }
+
+                    
+                    var dataType = element.attr("data-datatype");
+                    var value = element.val(); //$.trim();
+
+                    if(element.parent('.field').hasClass("hidden")){
                         return;
                     }
-                    else{
-                        // alert("has not from swift-submit");
+
+                    var closestToggleVisibleWrapper = element.closest(".toggleVisibleWrapper");
+                    if(typeof closestToggleVisibleWrapper != typeof undefined ){
+                        if(closestToggleVisibleWrapper.hasClass("hidden")){
+                            // alert("has");
+                            return;
+                        }
+                        else{
+                            // alert("has not from swift-submit");
+                        }
                     }
-                }
 
-                function isDoubleByte(str) {
-                    for (var i = 0, n = str.length; i < n; i++) {
-                        if (str.charCodeAt( i ) > 255) { return true; }
-                    }
-                    return false;
-                }
-
-                // if($.trim(String(value)) != ''){
-                //     var langBangla = element.attr("data-bangla");
-                //     if (langBangla !== false && typeof langBangla !== typeof undefined) {
-                //         //allow bangla
-                //     }
-                //     else{
-                //         let isInvalid = isDoubleByte($.trim(String(value)));
-                //         if(isInvalid){
-                //             hasError = true;
-                //             console.log(element.attr('name'));
-                //             $currentMessage = "<strong>" + title + "</strong>"  + " must be in english";
-                //             showError($currentMessage, element);
-                //             return false;
-                //         }
-                //     }
-                // }
-
-                if($.trim(String(value)) != ''){
-                    let isInvalid = isDoubleByte($.trim(String(value)));
-                    if(isInvalid){
-                        hasError = true;
-                        console.log(element.attr('name'));
-                        $currentMessage = "<strong>" + title + "</strong>"  + " must be in english";
-                        showError($currentMessage, element);
+                    function isDoubleByte(str) {
+                        for (var i = 0, n = str.length; i < n; i++) {
+                            if (str.charCodeAt( i ) > 255) { return true; }
+                        }
                         return false;
                     }
-                }
 
-                // var dataLang = element.attr("data-lang");
-                // if (dataLang !== false && typeof dataLang !== typeof undefined) {
-                //     if(dataLang == "english" && $.trim(value) != ''){
-                //         let isInvalid = isDoubleByte($.trim(value));
-                //         if(isInvalid){
-                //             hasError = true;
-                //             console.log(element.attr('name'));
-                //             $currentMessage = "<strong>" + title + "</strong>"  + " must be in english";
-                //             showError($currentMessage, element);
-                //             return false;
-                //         }
-                //     }
-                // }
+                    // if($.trim(String(value)) != ''){
+                    //     var langBangla = element.attr("data-bangla");
+                    //     if (langBangla !== false && typeof langBangla !== typeof undefined) {
+                    //         //allow bangla
+                    //     }
+                    //     else{
+                    //         let isInvalid = isDoubleByte($.trim(String(value)));
+                    //         if(isInvalid){
+                    //             hasError = true;
+                    //             console.log(element.attr('name'));
+                    //             $currentMessage = "<strong>" + title + "</strong>"  + " must be in english";
+                    //             showError($currentMessage, element);
+                    //             return false;
+                    //         }
+                    //     }
+                    // }
 
-                var isRequired = element.attr('data-required');
-                if (isRequired !== false && typeof isRequired !== typeof undefined) {
-                    if(element.is(':checkbox')){
-                        var checked = element.is(':checked');
-                        if (!checked) {
+                    if($.trim(String(value)) != ''){
+                        let isInvalid = isDoubleByte($.trim(String(value)));
+                        if(isInvalid){
                             hasError = true;
-                            $currentMessage = "<strong>" + title + "</strong>" + " required.";
                             console.log(element.attr('name'));
+                            $currentMessage = "<strong>" + title + "</strong>"  + " must be in english";
                             showError($currentMessage, element);
                             return false;
                         }
                     }
 
-                    if(isRequired == "required" && value == ""){
-                        hasError = true;
-                        console.log(element.attr('name'));
-                        $currentMessage = "<strong>" + title + "</strong>" + " required.";
-                        showError($currentMessage, element);
-                        return false;
-                    }
-                }
+                    // var dataLang = element.attr("data-lang");
+                    // if (dataLang !== false && typeof dataLang !== typeof undefined) {
+                    //     if(dataLang == "english" && $.trim(value) != ''){
+                    //         let isInvalid = isDoubleByte($.trim(value));
+                    //         if(isInvalid){
+                    //             hasError = true;
+                    //             console.log(element.attr('name'));
+                    //             $currentMessage = "<strong>" + title + "</strong>"  + " must be in english";
+                    //             showError($currentMessage, element);
+                    //             return false;
+                    //         }
+                    //     }
+                    // }
 
-                var dataType = element.attr("data-datatype");
-                var typeName = "characters";
-                if (dataType !== false && typeof dataType !== typeof undefined) {
-                    var length = $.trim(value).length;
-                    if(isRequired == "required" || (isRequired == "optional" && length>0)){
-                        switch (dataType) {
-                            case "letters":
-                                var re = /^[a-z\s]+$/i;
-                                if(!re.test(value)){
-                                    hasError = true;
-                                    message= title + " invalid." ;
-                                    showError(message, element);
-                                    return false;
-                                }                                
-                                break;
-                            case "email":
-                                var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                                if(!re.test(value)){
-                                    hasError = true;
-                                    $currentMessage= title + " invalid." ;
-                                    showError($currentMessage, element);
-                                    return false;
-                                }                                
-                                break;
-                            case "mobile":
-                                typeName = "digits";
-                                if(!IsMobileNumberValid(value)){
-                                    hasError = true;
-                                    $currentMessage = "<strong>" + title + "</strong>"  + " invalid." ;
-                                    showError($currentMessage, element);
-                                    return false;
-                                }
-                                break;
-                            case "integer":
-                            case "float":
-                            case "double":
-                            case "decimal":
-                                typeName = "digits";
+                    var isRequired = element.attr('data-required');
+                    if (isRequired !== false && typeof isRequired !== typeof undefined) {
+                        if(element.is(':checkbox')){
+                            var checked = element.is(':checked');
+                            if (!checked) {
+                                hasError = true;
+                                $currentMessage = "<strong>" + title + "</strong>" + " required.";
+                                console.log(element.attr('name'));
+                                showError($currentMessage, element);
+                                return false;
+                            }
+                        }
+
+                        if(isRequired == "required" && value == ""){
+                            hasError = true;
+                            console.log(element.attr('name'));
+                            $currentMessage = "<strong>" + title + "</strong>" + " required.";
+                            showError($currentMessage, element);
+                            return false;
+                        }
+                    }
+
+                    var dataType = element.attr("data-datatype");
+                    var typeName = "characters";
+                    if (dataType !== false && typeof dataType !== typeof undefined) {
+                        var length = $.trim(value).length;
+                        if(isRequired == "required" || (isRequired == "optional" && length>0)){
+                            switch (dataType) {
+                                case "letters":
+                                    var re = /^[a-z\s]+$/i;
+                                    if(!re.test(value)){
+                                        hasError = true;
+                                        message= title + " invalid." ;
+                                        showError(message, element);
+                                        return false;
+                                    }                                
+                                    break;
+                                case "email":
+                                    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                                    if(!re.test(value)){
+                                        hasError = true;
+                                        $currentMessage= title + " invalid." ;
+                                        showError($currentMessage, element);
+                                        return false;
+                                    }                                
+                                    break;
+                                case "mobile":
+                                    typeName = "digits";
+                                    if(!IsMobileNumberValid(value)){
+                                        hasError = true;
+                                        $currentMessage = "<strong>" + title + "</strong>"  + " invalid." ;
+                                        showError($currentMessage, element);
+                                        return false;
+                                    }
+                                    break;
+                                case "integer":
+                                case "float":
+                                case "double":
+                                case "decimal":
+                                    typeName = "digits";
+                                    if(isNaN(value)){
+                                        hasError = true;
+                                        $currentMessage= "<strong>" + title + "</strong>"  + " must be a valid number.";
+                                        showError($currentMessage, element);
+                                        return false;
+                                    }
+                                    break;
+                                case "date":
+                                    var dateValue = moment(value, "DD-MM-YYYY");
+                                    if(!dateValue.isValid()){
+                                        hasError = true;
+                                        $currentMessage= "<strong>" + title + "</strong>"  + " invalid." ;
+                                        showError($currentMessage, element);
+                                        return false;
+                                    }
+                                    
+                                    break;
+                                default:
+                                    // hasError = true;
+                                    // $currentMessage= "Datatype undefined for " + "<strong>" + title + "</strong>" + ".";
+                                    // return false;
+                                    break;
+                            }
+                        }
+                    }
+
+                    var minLength = element.attr("data-minlen");
+                    if (minLength !== false && typeof minLength !== typeof undefined) {
+                        var length = $.trim(value).length;
+                        minLength = parseInt(minLength);
+                        
+                        //if required, must be valid. If optional and no data then skip otherwise must be valid.
+                        if(isRequired == "required" || (isRequired == "optional" && length>0)){
+                            if(length < minLength){
+                                hasError = true;
+                                console.log(element.attr('name'));
+                                $currentMessage = "<strong>" + title + "</strong>"  + " must be equal or greater than " + minLength + " " + typeName + ".";
+                                showError($currentMessage, element);
+                                return false;
+                            }
+                        }
+                    }
+
+                    var maxLength = element.attr("data-maxlen");
+                    if (maxLength !== false && typeof maxLength !== typeof undefined) {
+                        var length = $.trim(value).length;
+                        maxLength = parseInt(maxLength);
+                        if(isRequired == "required" || (isRequired == "optional" && length>0)){
+                            if(length > maxLength){
+                                hasError = true;
+                                console.log(element.attr('name'));
+                                $currentMessage = "<strong>" + title + "</strong>"  + " must be equal or less than "+ maxLength + " " + typeName + ".";
+                                showError($currentMessage, element);
+                                return false;
+                            }
+                        }
+                    }
+
+                    var exactLength = element.attr("data-exactlen");
+                    if (exactLength !== false && typeof exactLength !== typeof undefined) {
+                        var length = $.trim(value).length;
+                        exactLength = parseInt(exactLength);
+                        if(isRequired == "required" || (isRequired == "optional" && length>0)){
+                            if(length !== exactLength){
+                                hasError = true;
+                                console.log(element.attr('name'));
+                                $currentMessage = "<strong>" + title + "</strong>"  + " must have "+ exactLength + " " + typeName + ".";
+                                showError($currentMessage, element);
+                                return false;
+                            }
+                        }
+                    }
+
+                    var minValue = element.attr("data-minval");
+                    if (minValue !== false && typeof minValue !== typeof undefined) {
+                        //Specific datatype is must for minimum value validation. 
+                        if (dataType !== false && typeof dataType === typeof undefined) {
+                            hasError = true;
+                            $currentMessage= "Datatype undefined for " + "<strong>" + title + "</strong>" + ".";
+                            showError($currentMessage, element);
+                            return false;
+                        }
+
+                        var length = $.trim(value).length;
+                        if(isRequired == "required" || (isRequired == "optional" && length>0)){
+                            if(dataType == "integer" || dataType == "float" || dataType == "double" || dataType == "decimal"){
                                 if(isNaN(value)){
                                     hasError = true;
                                     $currentMessage= "<strong>" + title + "</strong>"  + " must be a valid number.";
                                     showError($currentMessage, element);
                                     return false;
                                 }
-                                break;
-                            case "date":
-                                var dateValue = moment(value, "DD-MM-YYYY");
-                                if(!dateValue.isValid()){
+                            }
+                            
+                            switch (dataType){
+                                case "integer":
+                                    value = parseInt(value);
+                                    minValue = parseInt(minValue);
+                                    break;
+                                case "float":
+                                case "double":
+                                case "decimal":
+                                    value = parseFloat(value);
+                                    minValue = parseFloat(minValue);
+                                    break;
+                                case "date":
+                                    var value = moment(value, "DD-MM-YYYY");
+                                    if(!value.isValid()){
+                                        hasError = true;
+                                        $currentMessage= "<strong>" + title + "</strong>"  + " invalid." ;
+                                        showError($currentMessage, element);
+                                        return false;
+                                    }
+                                    minValue = moment(minValue, "DD-MM-YYYY");
+                                    break;
+                                default: 
                                     hasError = true;
-                                    $currentMessage= "<strong>" + title + "</strong>"  + " invalid." ;
+                                    $currentMessage= "Datatype undefined for " + "<strong>" + title + "</strong>"  + ".";
+                                    showError($currentMessage, element);
+                                    return false;
+                            }
+                            
+                            if(value < minValue){
+                                hasError = true;
+                                $currentMessage= "<strong>" + title + "</strong>"  + " must be equal or greater than " + minValue + ".";
+                                showError($currentMessage, element);
+                                return false;
+                            }
+                        }
+                    }
+
+                    var maxValue = element.attr("data-maxval");
+                    if (maxValue !== false && typeof maxValue !== typeof undefined) {
+                        //Specific datatype is must for maximum value validation. 
+                        if (dataType !== false && typeof dataType === typeof undefined) {
+                            hasError = true;
+                            $currentMessage= "Datatype undefined for " + title + ".";
+                            showError($currentMessage, element);
+                            return false;
+                        }
+
+                        var length = $.trim(value).length;
+                        if(isRequired == "required" || (isRequired == "optional" && length>0)){
+                            if(dataType == "integer" || dataType == "float" || dataType == "double" || dataType == "decimal"){
+                                if(isNaN(value)){
+                                    hasError = true;
+                                    $currentMessage= "<strong>" + title + "</strong>"  + " must be a valid number.";
                                     showError($currentMessage, element);
                                     return false;
                                 }
-                                
-                                break;
-                            default:
-                                // hasError = true;
-                                // $currentMessage= "Datatype undefined for " + "<strong>" + title + "</strong>" + ".";
-                                // return false;
-                                break;
+                            }
+                            
+                            switch (dataType){
+                                case "integer":
+                                    value = parseInt(value);
+                                    maxValue = parseInt(maxValue);
+                                    break;
+                                case "float":
+                                case "double":
+                                case "decimal":
+                                    value = parseFloat(value);
+                                    maxValue = parseFloat(maxValue);
+                                    break;
+                                case "date":
+                                    var value = moment(value, "DD-MM-YYYY");
+                                    if(!value.isValid()){
+                                        hasError = true;
+                                        $currentMessage= title + " invalid." ;
+                                        showError($currentMessage, element);
+                                        return false;
+                                    }
+                                    maxValue = moment(maxValue, "DD-MM-YYYY");
+                                    break;
+                                default: 
+                                    hasError = true;
+                                    $currentMessage= "Datatype undefined for " + "<strong>" + title + "</strong>" + ".";
+                                    showError($currentMessage, element);
+                                    return false;
+                            }
+                            
+                            if(value > maxValue){
+                                hasError = true;
+                                $currentMessage= "<strong>" + title + "</strong>"  + " must be equal or less than " + maxValue + ".";
+                                showError($currentMessage, element);
+                                return false;
+                            }
                         }
                     }
-                }
 
-                var minLength = element.attr("data-minlen");
-                if (minLength !== false && typeof minLength !== typeof undefined) {
-                    var length = $.trim(value).length;
-                    minLength = parseInt(minLength);
+                    var exactValue = element.attr("data-exactval");
+                    if (exactValue !== false && typeof exactValue !== typeof undefined) {
+                        //Specific datatype is must for exactimum value validation. 
+                        if (dataType !== false && typeof dataType === typeof undefined) {
+                            hasError = true;
+                            $currentMessage= "Datatype undefined for " + title + ".";
+                            showError($currentMessage, element);
+                            return false;
+                        }
+
+                        var length = $.trim(value).length;
+                        if(isRequired == "required" || (isRequired == "optional" && length>0)){
+                            if(dataType == "integer" || dataType == "float" || dataType == "double" || dataType == "decimal"){
+                                if(isNaN(value)){
+                                    hasError = true;
+                                    $currentMessage= "<strong>" + title + "</strong>"  + " must be a valid number.";
+                                    showError($currentMessage, element);
+                                    return false;
+                                }
+                            }
+                            
+                            switch (dataType){
+                                case "integer":
+                                    value = parseInt(value);
+                                    exactValue = parseInt(exactValue);
+                                    break;
+                                case "float":
+                                case "double":
+                                case "decimal":
+                                    value = parseFloat(value);
+                                    exactValue = parseFloat(exactValue);
+                                    break;
+                                case "date":
+                                    var value = moment(value, "DD-MM-YYYY");
+                                    if(!value.isValid()){
+                                        hasError = true;
+                                        $currentMessage= "<strong>" + title + "</strong>"  + " invalid." ;
+                                        showError($currentMessage, element);
+                                        return false;
+                                    }
+                                    exactValue = moment(exactValue, "DD-MM-YYYY");
+                                    break;
+                                default: 
+                                    hasError = true;
+                                    $currentMessage= "Datatype undefined for " + "<strong>" + title + "</strong>"  + ".";
+                                    showError($currentMessage, element);
+                                    return false;
+                            }
+                            
+                            if(value != exactValue){
+                                hasError = true;
+                                $currentMessage= "<strong>" + title + "</strong>"  + " must be equal to " + exactValue + ".";
+                                showError($currentMessage, element);
+                                return false;
+                            }
+                        }
+                    }
+
+                    if(element.hasClass("photo")){
+                        var maxSizeInKb = element.attr("data-maxkb");
+                        var requiredHeight = element.attr("data-height");
+                        var requiredWidth = element.attr("data-width");
+                        if (!ValidatePhoto(element, parseInt(maxSizeInKb), parseInt(requiredHeight), parseInt(requiredWidth))) {
+                            hasError = true;
+                            //NOTE: $currentMessage has been set inside the ValidatePhoto()
+                            return false;
+                        }
+                    }
+
+                    if(element.hasClass("signature")){
                     
-                    //if required, must be valid. If optional and no data then skip otherwise must be valid.
-                    if(isRequired == "required" || (isRequired == "optional" && length>0)){
-                        if(length < minLength){
+                        var maxSizeInKb = element.attr("data-maxkb");
+                        var requiredHeight = element.attr("data-height");
+                        var requiredWidth = element.attr("data-width");
+                        if (!ValidatePhoto(element, parseInt(maxSizeInKb), parseInt(requiredHeight), parseInt(requiredWidth))) {
                             hasError = true;
-                            console.log(element.attr('name'));
-                            $currentMessage = "<strong>" + title + "</strong>"  + " must be equal or greater than " + minLength + " " + typeName + ".";
-                            showError($currentMessage, element);
+                            //NOTE: $currentMessage has been set inside the ValidatePhoto()
                             return false;
                         }
                     }
-                }
 
-                var maxLength = element.attr("data-maxlen");
-                if (maxLength !== false && typeof maxLength !== typeof undefined) {
-                    var length = $.trim(value).length;
-                    maxLength = parseInt(maxLength);
-                    if(isRequired == "required" || (isRequired == "optional" && length>0)){
-                        if(length > maxLength){
-                            hasError = true;
-                            console.log(element.attr('name'));
-                            $currentMessage = "<strong>" + title + "</strong>"  + " must be equal or less than "+ maxLength + " " + typeName + ".";
-                            showError($currentMessage, element);
-                            return false;
-                        }
-                    }
-                }
-
-                var exactLength = element.attr("data-exactlen");
-                if (exactLength !== false && typeof exactLength !== typeof undefined) {
-                    var length = $.trim(value).length;
-                    exactLength = parseInt(exactLength);
-                    if(isRequired == "required" || (isRequired == "optional" && length>0)){
-                        if(length !== exactLength){
-                            hasError = true;
-                            console.log(element.attr('name'));
-                            $currentMessage = "<strong>" + title + "</strong>"  + " must have "+ exactLength + " " + typeName + ".";
-                            showError($currentMessage, element);
-                            return false;
-                        }
-                    }
-                }
-
-                var minValue = element.attr("data-minval");
-                if (minValue !== false && typeof minValue !== typeof undefined) {
-                    //Specific datatype is must for minimum value validation. 
-                    if (dataType !== false && typeof dataType === typeof undefined) {
-                        hasError = true;
-                        $currentMessage= "Datatype undefined for " + "<strong>" + title + "</strong>" + ".";
-                        showError($currentMessage, element);
-                        return false;
-                    }
-
-                    var length = $.trim(value).length;
-                    if(isRequired == "required" || (isRequired == "optional" && length>0)){
-                        if(dataType == "integer" || dataType == "float" || dataType == "double" || dataType == "decimal"){
-                            if(isNaN(value)){
-                                hasError = true;
-                                $currentMessage= "<strong>" + title + "</strong>"  + " must be a valid number.";
-                                showError($currentMessage, element);
-                                return false;
-                            }
-                        }
-                        
-                        switch (dataType){
-                            case "integer":
-                                value = parseInt(value);
-                                minValue = parseInt(minValue);
-                                break;
-                            case "float":
-                            case "double":
-                            case "decimal":
-                                value = parseFloat(value);
-                                minValue = parseFloat(minValue);
-                                break;
-                            case "date":
-                                var value = moment(value, "DD-MM-YYYY");
-                                if(!value.isValid()){
-                                    hasError = true;
-                                    $currentMessage= "<strong>" + title + "</strong>"  + " invalid." ;
-                                    showError($currentMessage, element);
-                                    return false;
-                                }
-                                minValue = moment(minValue, "DD-MM-YYYY");
-                                break;
-                            default: 
-                                hasError = true;
-                                $currentMessage= "Datatype undefined for " + "<strong>" + title + "</strong>"  + ".";
-                                showError($currentMessage, element);
-                                return false;
-                        }
-                        
-                        if(value < minValue){
-                            hasError = true;
-                            $currentMessage= "<strong>" + title + "</strong>"  + " must be equal or greater than " + minValue + ".";
-                            showError($currentMessage, element);
-                            return false;
-                        }
-                    }
-                }
-
-                var maxValue = element.attr("data-maxval");
-                if (maxValue !== false && typeof maxValue !== typeof undefined) {
-                    //Specific datatype is must for maximum value validation. 
-                    if (dataType !== false && typeof dataType === typeof undefined) {
-                        hasError = true;
-                        $currentMessage= "Datatype undefined for " + title + ".";
-                        showError($currentMessage, element);
-                        return false;
-                    }
-
-                    var length = $.trim(value).length;
-                    if(isRequired == "required" || (isRequired == "optional" && length>0)){
-                        if(dataType == "integer" || dataType == "float" || dataType == "double" || dataType == "decimal"){
-                            if(isNaN(value)){
-                                hasError = true;
-                                $currentMessage= "<strong>" + title + "</strong>"  + " must be a valid number.";
-                                showError($currentMessage, element);
-                                return false;
-                            }
-                        }
-                        
-                        switch (dataType){
-                            case "integer":
-                                value = parseInt(value);
-                                maxValue = parseInt(maxValue);
-                                break;
-                            case "float":
-                            case "double":
-                            case "decimal":
-                                value = parseFloat(value);
-                                maxValue = parseFloat(maxValue);
-                                break;
-                            case "date":
-                                var value = moment(value, "DD-MM-YYYY");
-                                if(!value.isValid()){
-                                    hasError = true;
-                                    $currentMessage= title + " invalid." ;
-                                    showError($currentMessage, element);
-                                    return false;
-                                }
-                                maxValue = moment(maxValue, "DD-MM-YYYY");
-                                break;
-                            default: 
-                                hasError = true;
-                                $currentMessage= "Datatype undefined for " + "<strong>" + title + "</strong>" + ".";
-                                showError($currentMessage, element);
-                                return false;
-                        }
-                        
-                        if(value > maxValue){
-                            hasError = true;
-                            $currentMessage= "<strong>" + title + "</strong>"  + " must be equal or less than " + maxValue + ".";
-                            showError($currentMessage, element);
-                            return false;
-                        }
-                    }
-                }
-
-                var exactValue = element.attr("data-exactval");
-                if (exactValue !== false && typeof exactValue !== typeof undefined) {
-                    //Specific datatype is must for exactimum value validation. 
-                    if (dataType !== false && typeof dataType === typeof undefined) {
-                        hasError = true;
-                        $currentMessage= "Datatype undefined for " + title + ".";
-                        showError($currentMessage, element);
-                        return false;
-                    }
-
-                    var length = $.trim(value).length;
-                    if(isRequired == "required" || (isRequired == "optional" && length>0)){
-                        if(dataType == "integer" || dataType == "float" || dataType == "double" || dataType == "decimal"){
-                            if(isNaN(value)){
-                                hasError = true;
-                                $currentMessage= "<strong>" + title + "</strong>"  + " must be a valid number.";
-                                showError($currentMessage, element);
-                                return false;
-                            }
-                        }
-                        
-                        switch (dataType){
-                            case "integer":
-                                value = parseInt(value);
-                                exactValue = parseInt(exactValue);
-                                break;
-                            case "float":
-                            case "double":
-                            case "decimal":
-                                value = parseFloat(value);
-                                exactValue = parseFloat(exactValue);
-                                break;
-                            case "date":
-                                var value = moment(value, "DD-MM-YYYY");
-                                if(!value.isValid()){
-                                    hasError = true;
-                                    $currentMessage= "<strong>" + title + "</strong>"  + " invalid." ;
-                                    showError($currentMessage, element);
-                                    return false;
-                                }
-                                exactValue = moment(exactValue, "DD-MM-YYYY");
-                                break;
-                            default: 
-                                hasError = true;
-                                $currentMessage= "Datatype undefined for " + "<strong>" + title + "</strong>"  + ".";
-                                showError($currentMessage, element);
-                                return false;
-                        }
-                        
-                        if(value != exactValue){
-                            hasError = true;
-                            $currentMessage= "<strong>" + title + "</strong>"  + " must be equal to " + exactValue + ".";
-                            showError($currentMessage, element);
-                            return false;
-                        }
-                    }
-                }
-
-                if(element.hasClass("photo")){
-                    var maxSizeInKb = element.attr("data-maxkb");
-                    var requiredHeight = element.attr("data-height");
-                    var requiredWidth = element.attr("data-width");
-                    if (!ValidatePhoto(element, parseInt(maxSizeInKb), parseInt(requiredHeight), parseInt(requiredWidth))) {
-                        hasError = true;
-                        //NOTE: $currentMessage has been set inside the ValidatePhoto()
-                        return false;
-                    }
-                }
-
-                if(element.hasClass("signature")){
-                
-                    var maxSizeInKb = element.attr("data-maxkb");
-                    var requiredHeight = element.attr("data-height");
-                    var requiredWidth = element.attr("data-width");
-                    if (!ValidatePhoto(element, parseInt(maxSizeInKb), parseInt(requiredHeight), parseInt(requiredWidth))) {
-                        hasError = true;
-                        //NOTE: $currentMessage has been set inside the ValidatePhoto()
-                        return false;
-                    }
-                }
-
-                element.removeClass("error");
-            });
+                    element.removeClass("error");
+                });
+            }
 
             if (hasError) {
                 hasError=false;
                 return;
             }
 
-            if (settings.validationRules) {
-                if (settings.validationRules() == false) {
+            if(settings.afterValidation) {
+                if (settings.afterValidation() == false) {
                     return;
                 }
             }
@@ -482,10 +496,18 @@
                 if(settings.format == "auto"){
                     // console.log($(form).serialize());
                     // submitFormAsAuto($(form).serialize());  //var data  = $(form).serialize();  // var data = new FormData(this);
-                    submitFormAsAuto(new FormData(this));  //var data  = $(form).serialize();  // var data = new FormData(this);
+                    let formData = new FormData(this);
+                    if($.isEmptyObject(settings.extraData) == false){
+                        $.each(settings.extraData, function( key, value )
+                        {
+                            formData.append(key, value);
+                        });
+                    }
+                    submitFormAsAuto(formData);  //var data  = $(form).serialize();  // var data = new FormData(this);
                 }
             }
             else{
+                //submit without ajax-
                 onBeforeSend();
                 $(form).unbind('submit'); //must unbind 'submit'
                 $(form).submit();
@@ -509,13 +531,10 @@
                 }
                 
                 button.attr('disabled', 'disabled');
-                if (settings.additionalBeforeSend) {
-                    settings.additionalBeforeSend();
-                }
             }
         }
 
-        function onSuccess(response) {
+        function onSuccess(response){
             if (settings.success){
                 button.removeAttr('disabled');
                 if(buttonTextElement.length !== 0){
