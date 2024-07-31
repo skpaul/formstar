@@ -1,4 +1,4 @@
-# FormStar (v1.0.0)
+# FormStar (v1.0.1)
 
 A JQuery plugin for quickly build, validate and submit an html form.
 
@@ -9,7 +9,7 @@ A JQuery plugin for quickly build, validate and submit an html form.
 **Using from a CDN**
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/skpaul/formstar@1.0.0/formstar.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/skpaul/formstar@1.0.1/formstar.min.js"></script>
 ```
 
 **Manual installation**
@@ -58,11 +58,12 @@ This is a list of all the `FormStar` configuration options-
 | `beforeValidation` | callback function() | `null`  | If provided, it will be executed before the built-in validation starts. <br />See example below for details. |
 | `validationRules`  | callback function() | `null`  | If provided, it will **completely replace** the built-in validation mechanism. <br />See example below for details. |
 | `afterValidation`  | callback function() | `null`  | If provided, it will be executed after the built-in validation finishes. <br />See example below for details. |
-| `beforeSend`       | callback function() | `null`  |                                                              |
+| `beforeSend`       | callback function() | `null`  | If provided, it will **completely replace** the built-in beforeSend mechanism.<br />See example below for details. |
 | `success`          | callback function() | `null`  |                                                              |
 | `error`            | callback function() | `null`  |                                                              |
 | `complete`         | callback function() | `null`  |                                                              |
 | `reset`            | boolean             | `true`  |                                                              |
+| beforeRedirect     | callback function() | `null`  | If redirecturl property exists in response object, this function is used to do some DOM<br />manipulation tasks (i.e. show message to user) before the build-in redirection occurs. |
 
 ### Options example
 
@@ -138,6 +139,7 @@ $('form').formstar({
 If provided, it will be executed after the built-in validation completed. This option useful if you want to do some post-checks after the built-in validation completes.
 
 ```javascript
+//example function
 function afterValidation() {
      let something = false;
      if (!something) {
@@ -156,6 +158,37 @@ $('form').formstar({
 					beforeValidation: beforeValidation,
 					validationRules: validationRules,
 					afterValidation: afterValidation,			
+					success:onSuccess
+				});
+```
+
+**beforeSend**
+
+If provided, it will **completely replace** the built-in beforeSend mechanism.
+
+```javascript
+//example function
+function beforeSend() {
+    if(buttonTextElement.length !== 0) {
+          buttonText = buttonTextElement.html();
+          buttonTextElement.html('Wait…');
+          buttonIconHtml = buttonIconElement.html();
+          buttonIconElement.addClass('spinner').html("autorenew").css("color", "#A3B9D8");
+     }
+     else{
+         buttonText = button.html();
+         button.html('Wait…');
+     }           
+     button.attr('disabled', 'disabled');
+}
+
+//usage
+$('form').formstar({
+					extraData:{name:"abc", id:104525},
+					beforeValidation: beforeValidation,
+					validationRules: validationRules,
+					afterValidation: afterValidation,
+    				beforeSend:beforeSend,
 					success:onSuccess
 				});
 ```

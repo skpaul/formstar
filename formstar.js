@@ -23,6 +23,7 @@
             afterValidation: null,
             beforeSend: null,
             success: null,
+            beforeRedirect: null,
             error: null,
             complete: null,
             reset: true
@@ -536,14 +537,14 @@
 
         function onSuccess(response){
             if (settings.success){
-                button.removeAttr('disabled');
-                if(buttonTextElement.length !== 0){
-                    buttonTextElement.html(buttonText);
-                    buttonIconElement.removeClass('spinner').html("done").css("color", "#A3B9D8");
-                }
-                else{
-                    button.html(buttonText);
-                }
+                // button.removeAttr('disabled');
+                // if(buttonTextElement.length !== 0){
+                //     buttonTextElement.html(buttonText);
+                //     buttonIconElement.removeClass('spinner').html("done").css("color", "#A3B9D8");
+                // }
+                // else{
+                //     button.html(buttonText);
+                // }
                 
                 settings.success(response);
             }
@@ -558,7 +559,6 @@
                     else{
                         button.html(buttonText);
                     }
-                    console.log(buttonText);
                     alert("Problem in getting response from server. Please try again.");
                     return false;
                 }
@@ -589,6 +589,9 @@
                     //If server sends any redirecturl, redirect to that url.
                     if(typeof response.redirecturl != typeof undefined )  //same as -> if(typeof $response.redirecturl != 'undefined' )
                     {
+                        if(settings.beforeRedirect){
+                            settings.beforeRedirect();
+                        }
                         window.location = response.redirecturl;
                     }
                 } //<--- response.issuccess
@@ -605,8 +608,7 @@
                     }
                     else{
                         button.html('Try again');
-                    }
-                   
+                    }                   
                 }
             }
         } //success ends
