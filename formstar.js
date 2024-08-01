@@ -1,7 +1,7 @@
 ﻿//formstar 	    : It is a handy tool to quickly submit the html form. 
 //author		: Saumitra Kumar Paul. skpaul@gmail.com.
 //Copyright		: You are free to use it anywhere anytime. But a thank-giving mail is appretiatable.
-//Last update   : 31st July, 2024
+//Last update   : 1st August, 2024.
 
 //NOTE: no element can have the reserved word "submit" as ID or NAME in the form.
 
@@ -16,24 +16,26 @@
 
         var settings = $.extend({
             format: "auto",
-            extraData: null,
             ajax:true,
+            extraData: null,
             beforeValidation: null,
-            validationRules: null,
+            onValidation: null,
             afterValidation: null,
             beforeSend: null,
-            response: null,
+            onResponse: null,
             successUndefined:null,
-            success:null,
+            onSuccess:null,
             successMessage:null,
             successButton:null,
-            fail:null,
+            onFail:null,
             failMessage:null,
             failButton:null,
             beforeRedirect: null,
             onRedirect: null,
-            error: null,
-            complete: null,
+            onError: null,
+            errorButton: null,
+            errorMessage: null,
+            onComplete: null,
             reset: true,
             beforeReset:null,
             onReset:null,
@@ -72,13 +74,13 @@
             var hasError = false;
 
             if(settings.beforeValidation) {
-                if (settings.beforeValidation() == false) {
+                if (settings.beforeValidation(form) == false) {
                     return;
                 }
             }
 
-            if(settings.validationRules) {
-                if (settings.validationRules() == false) {
+            if(settings.onValidation) {
+                if (settings.onValidation(form) == false) {
                     return;
                 }
             }
@@ -499,7 +501,7 @@
             }
 
             if(settings.afterValidation) {
-                if (settings.afterValidation() == false) {
+                if (settings.afterValidation(form) == false) {
                     return;
                 }
             }
@@ -548,8 +550,8 @@
 
         function onSuccess(response){
             //Handle all the functions after a response arrives from server, OR leave it for formstar.
-            if (settings.response){
-                settings.response(response, form);
+            if (settings.onResponse){
+                settings.onResponse(response, form);
             }
             else {
                 if(typeof response.issuccess == typeof undefined){
@@ -574,8 +576,8 @@
             
                 if(response.issuccess){
                     //Handle all the success consequences (show success msg, change button state & reset form), OR leave it for formstar.
-                    if(settings.success){
-                        settings.success(response, form);
+                    if(settings.onSuccess){
+                        settings.onSuccess(response, form);
                     }
                     else{
                         //If server sends any message to display, then show it here.
@@ -639,7 +641,7 @@
 
                             //Useful if you want to modify the response.redirecturl i.e. add/edit query string parameter/s.
                             if(settings.onRedirect){
-                                settings.onRedirect();
+                                settings.onRedirect(response.redirecturl);
                             }
                             else{
                                 window.location = response.redirecturl;
@@ -650,8 +652,8 @@
                 } //<--- response.issuccess
                 else{
                     //Handle all the fail consequences (show fail msg & change button state), OR leave it for formstar.
-                    if(settings.fail){
-                        settings.fail(response, form);
+                    if(settings.onFail){
+                        settings.onFail(response, form);
                     }
                     else{
                         //Show the message by yourself, OR, leave it for formstar.
@@ -685,34 +687,44 @@
         } //success ends
 
         function onError(xhr, status, error) {
-            if(buttonTextElement !== 0){
-                buttonTextElement.html('Try again');
-                buttonIconElement.removeClass('spinner').html("arrow_forward").css("color", "#A3B9D8");
+            if (settings.onError) {
+                settings.onError(xhr, status, error, button);
             }
             else{
-                button.html('Try again');
-            }
-           
-            if (settings.error) {
-                settings.error(xhr, status, error);
-            }
-            else {
-                HandleError(xhr, status, error);
-            }
+                if (settings.errorButton) {
+                    settings.errorButton(button);
+                }
+                else {
+                    if(buttonTextElement !== 0){
+                        buttonTextElement.html('Try again');
+                        buttonIconElement.removeClass('spinner').html("arrow_forward").css("color", "#A3B9D8");
+                    }
+                    else{
+                        button.html('Try again');
+                    }
+                }
+               
+                if (settings.errorMessage) {
+                    settings.errorMessage(xhr, status, error);
+                }
+                else {
+                    HandleError(xhr, status, error);
+                }
+            }            
         }
 
         function onCompleted() {
-            if (settings.complete) {
-                settings.complete();
+            if (settings.onComplete) {
+                settings.onComplete(form);
             }
             else {
                 button.removeAttr('disabled');
             }
         }
 
-        function submitFormAsAuto(data) {
+        function submitFormAsAuto(formData) {
             $.ajax({
-                data:data,
+                data:formData,
                 cache:false,
                 contentType: false,
                 processData: false,

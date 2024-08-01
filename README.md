@@ -1,4 +1,4 @@
-# FormStar (v1.0.2)
+# FormStar (v1.0.3)
 
 A JQuery plugin for quickly build, validate and submit an html form.
 
@@ -9,7 +9,7 @@ A JQuery plugin for quickly build, validate and submit an html form.
 **Using from a CDN**
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/skpaul/formstar@1.0.2/formstar.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/skpaul/formstar@1.0.3/formstar.min.js"></script>
 ```
 
 **Manual installation**
@@ -22,11 +22,7 @@ Include the compiled files in your page:
 <script src="path/to/formstar.min.js"></script>
 ```
 
-
-
 Prerequisite: JQuery, moment.js and sweetModal.js
-
-
 
 ## Basic usage
 
@@ -34,8 +30,6 @@ Prerequisite: JQuery, moment.js and sweetModal.js
 $('#form-one').formstar(); 
 $('#form-two').formstar();
 ```
-
-
 
 ## Configuration
 
@@ -45,30 +39,43 @@ To configure custom options when you initialize FormStar, simply pass an object 
 $('#form-one').formstar({ajax:false});  //submitted without JQuery AJAX.
 ```
 
-
-
 ## Options
 
 This is a list of all the `FormStar` configuration options-
 
 | Option             | Type                | Default | Description                                                  |
 | ------------------ | ------------------- | ------- | ------------------------------------------------------------ |
-| `ajax`             | boolean             | `true`  |                                                              |
+| `ajax`             | boolean             | `true`  | Whether the form will be submitted using JQuery AJAX or not. |
 | `extraData`        | object              | `null`  | Any additional data outside of the form. See examples below for details. |
-| `beforeValidation` | callback function() | `null`  | If provided, it will be executed before the built-in validation starts. <br />See example below for details. |
-| `validationRules`  | callback function() | `null`  | If provided, it will **completely replace** the built-in validation mechanism. <br />See example below for details. |
-| `afterValidation`  | callback function() | `null`  | If provided, it will be executed after the built-in validation finishes. <br />See example below for details. |
-| `beforeSend`       | callback function() | `null`  | If provided, it will **completely replace** the built-in beforeSend mechanism.<br />See example below for details. |
-| `success`          | callback function() | `null`  |                                                              |
-| `error`            | callback function() | `null`  |                                                              |
-| `complete`         | callback function() | `null`  |                                                              |
-| `reset`            | boolean             | `true`  |                                                              |
-| beforeRedirect     | callback function() | `null`  | If redirecturl property exists in response object, this function is used to do some DOM<br />manipulation tasks (i.e. show message to user) before the build-in redirection occurs. |
+| `beforeValidation(form)` | callback function() | `null`  | If provided, it will be executed before the built-in validation starts. See example below for details. |
+| `onValidation(form)`     | callback function() | `null`  | Override the default built-in validation mechanism. See example below for details. |
+| `afterValidation(form)`  | callback function() | `null`  | If provided, it will be executed after the built-in validation finishes. See example below for details. |
+| `beforeSend(form)`       | callback function() | `null`  | Override the default method. See example below for details. |
+| `onResponse(response, form)`       | callback function() | `null`  | Override the default method when a response arrives from server. The response has status code -200 (OK), means that the request was successful |
+| `successUndefined`       | callback function() | `null`  | Override the default method when a response arrives from server. |
+| `onSuccess(response, form)`       | callback function() | `null`  | Overrides the default method. The requesting task/s has been completed successfully by the back-end and `response.issuccess=true` is present in the response object. Useful if you want to handle all the success consequences (show msg, change button state, reset form etc.). |
+| `successMessage(message)`       | callback function() | `null`  | Overrides the default method of displaying the message.  |
+| `successButton(button)`       | callback function() | `null`  |  Overrides the default method of changing button states (i.e. change button text/icon, disable attribute etc.).  |
+| `onFail(response, form)`       | callback function() | `null`  |   Overrides the default method. The requesting task/s has been failed to complete by the back-end and `response.issuccess=false` is present in the response object. Useful if you want to handle all the consequences (show msg, change button state, reset form etc.). |
+| `failMessage(message)`       | callback function() | `null`  | Overrides the default method of displaying the message. |
+| `failButton(button)`       | callback function() | `null`  | Overrides the default method of changing button states (i.e. change button text/icon, disable attribute etc.).  |
+| `beforeRedirect()`       | callback function() | `null`  | Useful if you want to change DOM elements before redirect. |
+| `onRedirect(url)`       | callback function() | `null`  | Override the default method. Useful if you want to modify the response.redirecturl i.e. add/edit query string parameter/s. |
+| `onError(xhr, status, error, button)`       | callback function() | `null`  | Override the default method if the response has status code other than 200 (OK) |
+| `errorButton(button)`       | callback function() | `null`  | Overrides the default method of changing button states (i.e. change button text/icon, disable attribute etc.).  |
+| `errorMessage(xhr, status, error)`       | callback function() | `null`  | Overrides the default method of displaying the error message. |
+| `onComplete(form)`       | callback function() | `null`  | Override the default method. |
+| `reset`       | boolean | `true`  | Whether the form will be reset or not. |
+| `beforeReset(form)`       | callback function() | `null`  | Do some tasks before the actual reset starts. |
+| `onReset(form)`       | callback function() | `null`  | Override the default method. Reset the form in your own way |
+| `afterReset(form)`       | callback function() | `null`  | Do some tasks after the actual reset completes- |
 
-### Options example
+## Option details & example
+
+**ajax**
 
 ```javascript
-//Default value is true. This option is not needed if submitting via ajax.
+//Default value is true. This option is not needed if submitting via AJAX. Without AJAX submission, a page-reload occurs.
 $('form').formstar({ajax:false});
 ```
 
@@ -87,7 +94,7 @@ $('form').formstar({
 If provided, it will be executed before the built-in validation starts. This option useful if you want to do some pre-checks before the built-in validation starts.
 
 ```javascript
-function beforeValidation() {
+function beforeValidation(form) {
      let something = false;
      if (!something) {
          $.sweetModal({
@@ -107,13 +114,13 @@ $('form').formstar({
 				});
 ```
 
-**validationRules**
+**onValidation**
 
 If provided, it will **completely replace** the built-in validation mechanism.
 
 ```javascript
 //example function
-function validationRules() {
+function onValidation(form) {
      let something = false;
      if (!something) {
          $.sweetModal({
@@ -129,8 +136,7 @@ function validationRules() {
 $('form').formstar({
 					extraData:{name:"abc", id:104525},
 					beforeValidation: beforeValidation,
-					validationRules: validationRules,
-					success:onSuccess
+					onValidation: onValidation
 				});
 ```
 
@@ -140,7 +146,7 @@ If provided, it will be executed after the built-in validation completed. This o
 
 ```javascript
 //example function
-function afterValidation() {
+function afterValidation(form) {
      let something = false;
      if (!something) {
          $.sweetModal({
@@ -168,7 +174,7 @@ If provided, it will **completely replace** the built-in beforeSend mechanism.
 
 ```javascript
 //example function
-function beforeSend() {
+function beforeSend(form) {
     if(buttonTextElement.length !== 0) {
           buttonText = buttonTextElement.html();
           buttonTextElement.html('Wait…');
@@ -193,13 +199,13 @@ $('form').formstar({
 				});
 ```
 
-### **success**
+### **onResponse**
 
 It will **completely replace** the built-in `success()` function.
 
 ```javascript
 //example function
-function onSuccess(response){
+function onResponse(response, form){
     //By default, 'response' is a JavaScript object. But you can send any other format also from your back-end.
     if(response.issuccess){
         $icon.removeClass('spinner').html("done").css("color", "#A3B9D8"); //do some DOM manipulation.
@@ -218,7 +224,8 @@ function onSuccess(response){
 //usage
 $('form').formstar({
     				success:onSuccess,
-    				extraData:{name:"abc", id:104525}
+    				extraData:{name:"abc", id:104525},
+    				onResponse:onResponse
 				});
 ```
 
