@@ -1,7 +1,7 @@
 ﻿//formstar 	    : It is a handy tool to quickly submit the html form. 
 //author		: Saumitra Kumar Paul. skpaul@gmail.com.
 //Copyright		: You are free to use it anywhere anytime. But a thank-giving mail is appretiatable.
-//Last update   : 1st August, 2024.
+//Last update   : 2nd August, 2024.
 
 //NOTE: no element can have the reserved word "submit" as ID or NAME in the form.
 
