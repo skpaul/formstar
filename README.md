@@ -1,4 +1,4 @@
-# FormStar (v1.0.3)
+# FormStar (v1.0.4)
 
 A JQuery plugin for quickly build, validate and submit an html form.
 
@@ -9,7 +9,7 @@ A JQuery plugin for quickly build, validate and submit an html form.
 **Using from a CDN**
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/skpaul/formstar@1.0.3/formstar.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/skpaul/formstar@1.0.4/formstar.min.js"></script>
 ```
 
 **Manual installation**
@@ -54,21 +54,23 @@ This is a list of all the `FormStar` configuration options-
 | `onResponse(response, form)`       | callback function() | `null`  | Override the default method when a response arrives from server. The response has status code -200 (OK), means that the request was successful |
 | `successUndefined`       | callback function() | `null`  | Override the default method when a response arrives from server. |
 | `onSuccess(response, form)`       | callback function() | `null`  | Overrides the default method. The requesting task/s has been completed successfully by the back-end and `response.issuccess=true` is present in the response object. Useful if you want to handle all the success consequences (show msg, change button state, reset form etc.). |
-| `successMessage(message)`       | callback function() | `null`  | Overrides the default method of displaying the message.  |
-| `successButton(button)`       | callback function() | `null`  |  Overrides the default method of changing button states (i.e. change button text/icon, disable attribute etc.).  |
+| `beforeSuccessMessage(response, form)` | callback function() | `null`  | Do some tasks before showing the message. If empty, FormStar will not do anything. If you already override the `onSuccess()` callback, this method WILL NOT BE INVOKED.|
+| `onSuccessMessage(message)`       | callback function() | `null`  | Overrides the default method of displaying the message. If you already override the `onSuccess()` callback, this method WILL NOT BE INVOKED. |
+| `afterSuccessMessage(response, form)` | callback function() | `null`  | Do some tasks after showing the message. If empty, FormStar will not do anything. If you already override the `onSuccess()` callback, this method WILL NOT BE INVOKED.|
+| `successButton(button)`       | callback function() | `null`  |  Overrides the default method of changing button states (i.e. change button text/icon, disable attribute etc.). If you already override the `onSuccess()` callback, this method WILL NOT BE INVOKED. |
 | `onFail(response, form)`       | callback function() | `null`  |   Overrides the default method. The requesting task/s has been failed to complete by the back-end and `response.issuccess=false` is present in the response object. Useful if you want to handle all the consequences (show msg, change button state, reset form etc.). |
 | `failMessage(message)`       | callback function() | `null`  | Overrides the default method of displaying the message. |
 | `failButton(button)`       | callback function() | `null`  | Overrides the default method of changing button states (i.e. change button text/icon, disable attribute etc.).  |
-| `beforeRedirect()`       | callback function() | `null`  | Useful if you want to change DOM elements before redirect. |
-| `onRedirect(url)`       | callback function() | `null`  | Override the default method. Useful if you want to modify the response.redirecturl i.e. add/edit query string parameter/s. |
+| `beforeRedirect()`       | callback function() | `null`  | Useful if you want to change DOM elements before redirect. If you already override the `onSuccess()` callback, this method WILL NOT BE INVOKED. |
+| `onRedirect(url)`       | callback function() | `null`  | Override the default method. Useful if you want to modify the response.redirecturl i.e. add/edit query string parameter/s. If you already override the `onSuccess()` callback, this method WILL NOT BE INVOKED. |
 | `onError(xhr, status, error, button)`       | callback function() | `null`  | Override the default method if the response has status code other than 200 (OK) |
 | `errorButton(button)`       | callback function() | `null`  | Overrides the default method of changing button states (i.e. change button text/icon, disable attribute etc.).  |
 | `errorMessage(xhr, status, error)`       | callback function() | `null`  | Overrides the default method of displaying the error message. |
 | `onComplete(form)`       | callback function() | `null`  | Override the default method. |
 | `reset`       | boolean | `true`  | Whether the form will be reset or not. |
-| `beforeReset(form)`       | callback function() | `null`  | Do some tasks before the actual reset starts. |
-| `onReset(form)`       | callback function() | `null`  | Override the default method. Reset the form in your own way |
-| `afterReset(form)`       | callback function() | `null`  | Do some tasks after the actual reset completes- |
+| `beforeReset(form)`       | callback function() | `null`  | Do some tasks before the actual reset starts. If you already override the `onSuccess()` callback, this method WILL NOT BE INVOKED. |
+| `onReset(form)`       | callback function() | `null`  | Override the default method. Reset the form in your own way. If you already override the `onSuccess()` callback, this method WILL NOT BE INVOKED. |
+| `afterReset(form)`       | callback function() | `null`  | Do some tasks after the actual reset completes. If you already override the `onSuccess()` callback, this method WILL NOT BE INVOKED. |
 
 ## Option details & example
 

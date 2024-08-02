@@ -25,7 +25,9 @@
             onResponse: null,
             successUndefined:null,
             onSuccess:null,
-            successMessage:null,
+            beforeSuccessMessage:null,
+            onSuccessMessage:null,
+            afterSuccessMessage:null,
             successButton:null,
             onFail:null,
             failMessage:null,
@@ -583,15 +585,21 @@
                         //If server sends any message to display, then show it here.
                         if(typeof response.message != typeof undefined )  //same as-> if(typeof $response.message != 'undefined' )
                         {
-                            //Show the success message by yourself, or leave it for formstar.
-                            if(settings.successMessage){
-                                settings.successMessage(response.message);
+                            if(settings.beforeSuccessMessage){
+                                settings.beforeSuccessMessage(response, form);
+                            }
+
+                            if(settings.onSuccessMessage){
+                                settings.onSuccessMessage(response, form);
                             }
                             else{
                                 $.sweetModal({
                                     content: response.message,
                                     icon: $.sweetModal.ICON_SUCCESS
                                 });
+                            }
+                            if(settings.afterSuccessMessage){
+                                settings.afterSuccessMessage(response, form);
                             }
                            
                             //Change the button state by yourself, or leave it for formstar.
