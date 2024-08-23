@@ -122,16 +122,16 @@
                         return false;
                     }
 
-                    if($.trim(String(value)) != ''){
-                        let isInvalid = isDoubleByte($.trim(String(value)));
-                        if(isInvalid){
-                            hasError = true;
-                            console.log(element.attr('name'));
-                            $currentMessage = "<strong>" + title + "</strong>"  + " must be in english";
-                            showError($currentMessage, element);
-                            return false;
-                        }
-                    }
+                    // if($.trim(String(value)) != ''){
+                    //     let isInvalid = isDoubleByte($.trim(String(value)));
+                    //     if(isInvalid){
+                    //         hasError = true;
+                    //         console.log(element.attr('name'));
+                    //         $currentMessage = "<strong>" + title + "</strong>"  + " must be in english";
+                    //         showError($currentMessage, element);
+                    //         return false;
+                    //     }
+                    // }
 
                     var allowUnicode = element.attr("data-unicode"); ////Default is Unicode not allowed
                     if(allowUnicode !== false && typeof allowUnicode !== typeof undefined) {
