@@ -114,29 +114,13 @@
                         }
                     }
 
+                    //find whether a particular string has unicode characters (esp. Double Byte characters)
                     function isDoubleByte(str) {
                         for (var i = 0, n = str.length; i < n; i++) {
                             if (str.charCodeAt( i ) > 255) { return true; }
                         }
                         return false;
                     }
-
-                    // if($.trim(String(value)) != ''){
-                    //     var langBangla = element.attr("data-bangla");
-                    //     if (langBangla !== false && typeof langBangla !== typeof undefined) {
-                    //         //allow bangla
-                    //     }
-                    //     else{
-                    //         let isInvalid = isDoubleByte($.trim(String(value)));
-                    //         if(isInvalid){
-                    //             hasError = true;
-                    //             console.log(element.attr('name'));
-                    //             $currentMessage = "<strong>" + title + "</strong>"  + " must be in english";
-                    //             showError($currentMessage, element);
-                    //             return false;
-                    //         }
-                    //     }
-                    // }
 
                     if($.trim(String(value)) != ''){
                         let isInvalid = isDoubleByte($.trim(String(value)));
@@ -149,19 +133,32 @@
                         }
                     }
 
-                    // var dataLang = element.attr("data-lang");
-                    // if (dataLang !== false && typeof dataLang !== typeof undefined) {
-                    //     if(dataLang == "english" && $.trim(value) != ''){
-                    //         let isInvalid = isDoubleByte($.trim(value));
-                    //         if(isInvalid){
-                    //             hasError = true;
-                    //             console.log(element.attr('name'));
-                    //             $currentMessage = "<strong>" + title + "</strong>"  + " must be in english";
-                    //             showError($currentMessage, element);
-                    //             return false;
-                    //         }
-                    //     }
-                    // }
+                    var allowUnicode = element.attr("data-unicode"); ////Default is Unicode not allowed
+                    if(allowUnicode !== false && typeof allowUnicode !== typeof undefined) {
+                        if(allowUnicode == "no" && $.trim(String(value)) != ''){
+                            let isInvalid = isDoubleByte($.trim(String(value)));
+                            if(isInvalid){
+                                hasError = true;
+                                console.log(element.attr('name'));
+                                $currentMessage = "<strong>" + title + "</strong>"  + " : Unicode not allowed";
+                                showError($currentMessage, element);
+                                return false;
+                            }
+                        }
+                    }
+                    else{
+                        //Default is Unicode not allowed
+                        if($.trim(String(value)) != ''){
+                            let isInvalid = isDoubleByte($.trim(String(value)));
+                            if(isInvalid){
+                                hasError = true;
+                                console.log(element.attr('name'));
+                                $currentMessage = "<strong>" + title + "</strong>"  + " : Unicode not allowed.";
+                                showError($currentMessage, element);
+                                return false;
+                            }
+                        }
+                    }
 
                     var isRequired = element.attr('data-required');
                     if (isRequired !== false && typeof isRequired !== typeof undefined) {

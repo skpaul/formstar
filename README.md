@@ -1,4 +1,4 @@
-# FormStar (v1.0.5)
+# FormStar (v1.0.6)
 
 A JQuery plugin for quickly build, validate and submit an html form.
 
@@ -9,7 +9,7 @@ A JQuery plugin for quickly build, validate and submit an html form.
 **Using from a CDN**
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/skpaul/formstar@1.0.5/formstar.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/skpaul/formstar@1.0.6/formstar.min.js"></script>
 ```
 
 **Manual installation**
@@ -343,6 +343,12 @@ Available data types-
 
 ```html
 <input type="text" class="validate" data-exactval="6">
+```
+
+### Unicode validation
+
+```html
+<input type="text" class="validate" data-unicode="yes"> //default is 'no'
 ```
 
 ### Photo/Signature validation
