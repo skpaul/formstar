@@ -67,7 +67,8 @@
                 scrollTop: $element.offset().top - 50
             }, 1000);
 
-            $element.focus();
+           //this focus() overrides the css focus style. So, this feature turned off.
+           // $element.focus();
         }
   
         form.on('submit', function (event) {
