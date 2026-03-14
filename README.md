@@ -50,6 +50,7 @@ This is a list of all the `FormStar` configuration options-
 | `beforeValidation(form)` | callback function() | `null`  | If provided, it will be executed before the built-in validation starts. See example below for details. |
 | `onValidation(form)`     | callback function() | `null`  | Override the default built-in validation mechanism. See example below for details. |
 | `afterValidation(form)`  | callback function() | `null`  | If provided, it will be executed after the built-in validation finishes. See example below for details. |
+| `onShowingError(message, element)` | callback function() | `null` | If provided, this function will be called instead of the built-in error display when a validation error occurs. Use this to fully customize how validation errors are shown (e.g., custom modals, tooltips, inline messages, etc.). Receives the error message and the input element as arguments. |
 | `beforeSend(form)`       | callback function() | `null`  | Override the default method. See example below for details. |
 | `onResponse(response, form)`       | callback function() | `null`  | Override the default method when a response arrives from server. The response has status code -200 (OK), means that the request was successful |
 | `successUndefined`       | callback function() | `null`  | Override the default method when a response arrives from server. |
@@ -73,6 +74,31 @@ This is a list of all the `FormStar` configuration options-
 | `afterReset(form)`       | callback function() | `null`  | Do some tasks after the actual reset completes. If you already override the `onSuccess()` callback, this method WILL NOT BE INVOKED. |
 
 ## Option details & example
+
+**onShowingError**
+
+If provided, this function will be called instead of the built-in error display when a validation error occurs. Use this to fully customize how validation errors are shown (e.g., custom modals, tooltips, inline messages, etc.).
+
+
+```javascript
+// Declare the error display function first
+function showTooltipError(message, element) {
+    // Example: Show error as a tooltip
+    $(element).tooltip({
+        title: message,
+        placement: 'right',
+        trigger: 'manual'
+    }).tooltip('show');
+    $(element).addClass('error');
+}
+
+// Use it in formstar
+$('#form-one').formstar({
+    onShowingError: showTooltipError
+});
+```
+
+If `onShowingError` is not provided, FormStar will use its built-in modal and error highlighting.
 
 **ajax**
 
